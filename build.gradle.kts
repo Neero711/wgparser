@@ -10,6 +10,14 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
+tasks {
+    processResources {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        from("src/main/resources") {
+            include("**/*")
+        }
+    }
+}
 
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
@@ -23,3 +31,5 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+
