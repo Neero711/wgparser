@@ -28,20 +28,23 @@
         <tr th:each="entry : ${entries}">
             <td th:text="${entry.name}"></td>
             <td>
-                <button class="btn btn-sm btn-primary copy-btn"
-                        th:attr="data-clipboard-text=${entry.importString}">
-                    Копировать строку импорта
-                </button>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control"
+                           th:value="${entry.importString}"
+                           id="importString-[[${entryStat.index}]]">
+                    <button class="btn btn-outline-secondary"
+                            onclick="selectText('importString-[[${entryStat.index}]]')">
+                        Выделить
+                    </button>
+                </div>
 
                 <script>
-                    document.querySelectorAll('.copy-btn').forEach(btn => {
-                        btn.addEventListener('click', function () {
-                            const text = this.getAttribute('data-clipboard-text');
-                            navigator.clipboard.writeText(text).then(() => {
-                                alert('Строка скопирована!');
-                            });
-                        });
-                    });
+                    function selectText(id) {
+                        const input = document.getElementById(id);
+                        input.select();
+                        input.setSelectionRange(0, 99999);
+                        alert('Текст выделен — нажмите Ctrl+C');
+                    }
                 </script>
             </td>
         </tr>
