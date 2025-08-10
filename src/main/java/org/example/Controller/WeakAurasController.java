@@ -44,23 +44,34 @@ public class WeakAurasController {
         }
     }
 
-    private List<WeakAuraEntry> parseWeakAurasFile(MultipartFile file) throws IOException {
+     List<WeakAuraEntry> parseWeakAurasFile(MultipartFile file) throws IOException {
         List<WeakAuraEntry> entries = new ArrayList<>();
-        Pattern pattern = Pattern.compile("!WA:2![^\\s]+\\s*\\|(.*?)\\|(.*)");
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            StringBuilder fileContent = new StringBuilder();
+            String currentName = "Unnamed WeakAura";
             String line;
 
             while ((line = reader.readLine()) != null) {
-                fileContent.append(line).append("\n");
-            }
+                line = line.trim();
 
-            Matcher matcher = pattern.matcher(fileContent.toString());
-            while (matcher.find()) {
-                String name = matcher.group(1).trim();
-                String importString = matcher.group(0).trim(); // Полная строка импорта
-                entries.add(new WeakAuraEntry(name, importString));
+                if (line.startsWith("|") && line.endsWith("|") && line.length() > 2) {
+                    currentName = line.substring(1, line.length() - 1).trim();
+                }
+                else if (line.startsWith("|") && line.contains("|") && line.contains("!WA:2!")) {
+                    String[] parts = line.split("\\|", 3);
+                    if (parts.length >= 2) {
+                        currentName = parts[1].trim();
+                        String importString = parts[2].trim();
+                        if (importString.startsWith("!WA:2!")) {
+                            entries.add(new WeakAuraEntry(currentName, importString));
+                            currentName = "Unnamed WeakAura";
+                        }
+                    }
+                }
+                else if (line.startsWith("!WA:2!")) {
+                    entries.add(new WeakAuraEntry(currentName, line));
+                    currentName = "Unnamed WeakAura";
+                }
             }
         }
 
